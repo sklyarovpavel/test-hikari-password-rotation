@@ -1,6 +1,4 @@
 package com.example.rotation.service;
-
-import com.example.rotation.config.RuntimeOverrides;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.HikariPoolMXBean;
 import org.slf4j.Logger;
@@ -22,12 +20,9 @@ public class CredentialsRotationService {
 
 	private final HikariDataSource hikariDataSource;
 	private final JdbcTemplate jdbcTemplate;
-	private final RuntimeOverrides runtimeOverrides;
-
-	public CredentialsRotationService(DataSource dataSource, JdbcTemplate jdbcTemplate, RuntimeOverrides runtimeOverrides) {
+	public CredentialsRotationService(DataSource dataSource, JdbcTemplate jdbcTemplate) {
 		this.hikariDataSource = (HikariDataSource) dataSource;
 		this.jdbcTemplate = jdbcTemplate;
-		this.runtimeOverrides = runtimeOverrides;
 	}
 
 	public Map<String, Object> currentPoolInfo() {
@@ -45,22 +40,7 @@ public class CredentialsRotationService {
 		return jdbcTemplate.queryForObject("select current_user", String.class);
 	}
 
-	public void applySpringDatasourceOverrides(Map<String, String> props) {
-		Map<String, String> allowed = new HashMap<>();
-		props.forEach((k, v) -> {
-			if (Objects.equals(k, "spring.datasource.username") || Objects.equals(k, "spring.datasource.password")) {
-				allowed.put(k, v);
-			}
-		});
-		if (allowed.isEmpty()) {
-			log.info("No spring.datasource.* overrides provided, skipping");
-			return;
-		}
-		runtimeOverrides.putAll(allowed);
-		String newUser = allowed.getOrDefault("spring.datasource.username", hikariDataSource.getUsername());
-		String newPass = allowed.getOrDefault("spring.datasource.password", null);
-		rotateCredentials(newUser, newPass);
-	}
+	// REST override removed per requirements; rotation happens via scheduler/file provider
 
 	public synchronized void rotateCredentials(String username, String password) {
 		String oldUser = hikariDataSource.getUsername();

@@ -1,9 +1,20 @@
 #!/bin/sh
 set -eu
-BASE_URL="${1:-http://localhost:8080}"
-curl -sS -X POST "$BASE_URL/internal/config/override" \
-  -H "Content-Type: application/json" \
-  -d '{"spring.datasource.username":"app_user_a","spring.datasource.password":"app_pass_a"}'
-echo
-echo "Switched spring.datasource.* to app_user_a"
+RES_FILE="${1:-./src/main/resources/application.yml}"
+TARGET_FILE="${2:-./target/classes/application.yml}"
+
+update_file() {
+  f="$1"
+  if [ ! -f "$f" ]; then
+    echo "Skip $f (not found)"
+    return 0
+  fi
+  # Обновляем только ключи в блоке spring.datasource.*, не трогая другие username/password
+  sed -E -i '/^[[:space:]]*datasource:[[:space:]]*$/,/^[^[:space:]]/ s|(^[[:space:]]*username:[[:space:]]*).*$|\1app_user_a|' "$f"
+  sed -E -i '/^[[:space:]]*datasource:[[:space:]]*$/,/^[^[:space:]]/ s|(^[[:space:]]*password:[[:space:]]*).*$|\1app_pass_a|' "$f"
+  echo "Updated credentials in $f -> app_user_a"
+}
+
+update_file "$RES_FILE"
+update_file "$TARGET_FILE"
 

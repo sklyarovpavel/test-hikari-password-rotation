@@ -3,8 +3,8 @@ spring:
     name: hikari-password-rotation
   datasource:
     url: jdbc:postgresql://localhost:5432/appdb
-    username: app_user_b
-    password: app_pass_b
+    username: app_user_a
+    password: app_pass_a
     driver-class-name: org.postgresql.Driver
     hikari:
       max-lifetime: 60000
