@@ -1,0 +1,29 @@
+# Java
+*.class
+*.log
+*.ctxt
+hs_err_pid*
+replay_pid*
+
+# Build outputs
+/target/
+/out/
+
+# Archives
+*.jar
+*.war
+*.ear
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Environment / local overrides
+.env
+
